@@ -8,112 +8,116 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
-    <div class="ide-shell">
+    <div class="app-shell">
       <aside class="activity-bar" aria-label="Primary navigation">
-        <button class="active" title="Explorer" aria-label="Explorer">
-          <span></span>
-        </button>
-        <button title="Search" aria-label="Search">
-          <span></span>
-        </button>
-        <button title="Source Control" aria-label="Source Control">
-          <span></span>
-        </button>
-        <button title="Run" aria-label="Run">
-          <span></span>
-        </button>
-        <button title="Extensions" aria-label="Extensions">
-          <span></span>
-        </button>
+        <button class="activity-btn active" aria-label="Explorer">📁</button>
+        <button class="activity-btn" aria-label="Search">🔎</button>
+        <button class="activity-btn" aria-label="Source Control">⌥</button>
+        <button class="activity-btn" aria-label="Run and Debug">▶️</button>
+        <button class="activity-btn" aria-label="Extensions">🧩</button>
       </aside>
 
-      <div class="workspace">
+      <div class="main-column">
         <header class="command-bar">
-          <div class="command-meta">
-            <span class="command-badge">voyager</span>
+          <div class="brand">
+            <span class="brand-dot"></span>
             <div>
-              <h1>Voyager Studio</h1>
-              <p>Write, run, analyze, and auto-fix JavaScript in a windswept VS Code inspired shell.</p>
-              <small class="helper">Use <code>readLine()</code> or <code>getInput()</code> to read sandbox input.</small>
+              <strong>Mini IDE</strong>
+              <small>Cursor-inspired workspace</small>
             </div>
           </div>
-          <div class="actions">
-            <button id="analyze-btn">Explain</button>
-            <button id="autofix-btn" class="secondary">Auto Fix</button>
-            <button id="run-btn" class="primary">Run ▶</button>
+          <nav class="menu-strip" aria-label="Application menu">
+            <button type="button">File</button>
+            <button type="button">Edit</button>
+            <button type="button">Selection</button>
+            <button type="button">Run</button>
+            <button type="button">AI</button>
+            <button type="button">Help</button>
+          </nav>
+          <div class="command-actions">
+            <label class="command-search">
+              <span aria-hidden="true">⌘</span>
+              <input
+                type="search"
+                placeholder="Search files or run command (Ctrl/Cmd + P)"
+                aria-label="Quick search"
+              />
+            </label>
+            <div class="action-buttons">
+              <button id="analyze-btn">Analyze</button>
+              <button id="autofix-btn" class="ghost">Auto Fix</button>
+              <button id="run-btn" class="primary">Run ▶</button>
+            </div>
           </div>
         </header>
 
-        <div class="tab-strip" role="tablist">
-          <div class="tab active" role="tab" aria-selected="true">main.js</div>
-          <div class="tab" role="tab" aria-selected="false">analysis.log</div>
-          <div class="tab ghost" role="tab" aria-selected="false">+ New File</div>
-        </div>
+        <main class="workspace">
+          <section class="explorer-panel" aria-label="Project explorer">
+            <div class="explorer-header">EXPLORER</div>
+            <ul class="file-tree">
+              <li class="open">📁 sandbox</li>
+              <li>└── server.js</li>
+              <li>└── public</li>
+              <li class="active-file">&nbsp;&nbsp;&nbsp;├── index.html</li>
+              <li>&nbsp;&nbsp;&nbsp;├── app.js</li>
+              <li>&nbsp;&nbsp;&nbsp;└── styles.css</li>
+            </ul>
+            <p class="helper">Use <code>readLine()</code> to read sandbox input.</p>
+          </section>
 
-        <main class="editor-surface">
-          <section class="editor-panel">
-            <div class="panel-titlebar">
-              <div>
-                <strong>main.js</strong>
-                <span>JavaScript · sandbox</span>
-              </div>
-              <span class="pill">Monaco</span>
+          <section class="editor-stack">
+            <div class="tab-bar" role="tablist">
+              <button class="tab active" role="tab" aria-selected="true">app.js</button>
+              <button class="tab" role="tab" aria-selected="false">README.md</button>
             </div>
-            <div class="code-stage">
+            <div class="editor-panel">
               <div id="editor"></div>
-            </div>
-            <div class="input-panel">
-              <div class="panel-titlebar compact">
-                <div>
-                  <strong>Program input</strong>
-                  <span>stdin stream</span>
-                </div>
-                <span class="pill muted">readLine()</span>
+              <div class="input-panel">
+                <label for="stdin">Program input</label>
+                <textarea id="stdin" placeholder="Provide newline separated input"></textarea>
               </div>
-              <textarea id="stdin" placeholder="Provide newline separated input"></textarea>
             </div>
           </section>
+
           <section class="insights-panel">
-            <div class="card" id="execution-card">
-              <div class="panel-titlebar compact">
-                <div>
-                  <strong>Execution</strong>
-                  <span>Runtime logs & errors</span>
-                </div>
-                <span class="pill muted" id="duration">—</span>
+            <div class="panel-card" id="execution-card">
+              <div class="panel-header">
+                <h2>Terminal</h2>
+                <span>Run output</span>
               </div>
               <div class="output-block">
-                <p class="label">Logs</p>
+                <p><strong>Logs</strong></p>
                 <pre id="logs"></pre>
               </div>
               <div class="output-block">
-                <p class="label">Errors</p>
+                <p><strong>Errors</strong></p>
                 <pre id="errors"></pre>
+              </div>
+              <div class="output-block duration">
+                <p><strong>Duration</strong></p>
+                <span id="duration">&mdash;</span>
               </div>
             </div>
 
-            <div class="card" id="analysis-card">
-              <div class="panel-titlebar compact">
-                <div>
-                  <strong>AI Insights</strong>
-                  <span>Explanation, issues, suggestions</span>
-                </div>
-                <span class="pill">AI</span>
+            <div class="panel-card" id="analysis-card">
+              <div class="panel-header">
+                <h2>AI Insights</h2>
+                <span>Explainers & fixes</span>
               </div>
-              <div class="analysis-block">
+              <div>
                 <h3>Explanation</h3>
                 <p id="explanation">Run an analysis to get a summary.</p>
               </div>
-              <div class="analysis-block">
+              <div>
                 <h3>Potential Issues</h3>
                 <ul id="issues"></ul>
               </div>
-              <div class="analysis-block">
+              <div>
                 <h3>Suggestions</h3>
                 <ul id="suggestions"></ul>
               </div>
@@ -121,14 +125,7 @@
           </section>
         </main>
 
-        <footer class="status-bar">
-          <div id="status-bar" role="status" aria-live="polite">Ready.</div>
-          <div class="status-meta">
-            <span>Spaces: 2</span>
-            <span>UTF-8</span>
-            <span>LF</span>
-          </div>
-        </footer>
+        <footer id="status-bar" class="status-bar" role="status" aria-live="polite">Ready.</footer>
       </div>
     </div>
 
