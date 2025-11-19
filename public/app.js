@@ -154,5 +154,5 @@ function toggleBusy(button, isBusy) {
 
 function setStatus(message, state) {
   statusBar.textContent = message || '';
-  statusBar.className = `status-bar${state ? ` ${state}` : ''}`;
+  statusBar.className = state ? state : '';
 }
