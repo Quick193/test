@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini IDE</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="activity-bar" aria-label="Primary navigation">
+        <button class="activity active" aria-label="Editor" data-tooltip="Editor">
+          <span>&lt;/&gt;</span>
+        </button>
+        <button class="activity" aria-label="Runner" data-tooltip="Runner">
+          <span>▶</span>
+        </button>
+        <button class="activity" aria-label="AI" data-tooltip="AI Insights">
+          <span>★</span>
+        </button>
+        <button class="activity" aria-label="Settings" data-tooltip="Settings">
+          <span>⚙</span>
+        </button>
+      </aside>
+
+      <div class="workspace">
+        <header class="command-bar">
+          <div class="title-group">
+            <div class="title-row">
+              <span class="accent-dot" aria-hidden="true"></span>
+              <h1>Mini IDE</h1>
+            </div>
+            <p>VS Code-inspired playground for JavaScript experiments.</p>
+            <small class="helper">Use <code>readLine()</code> or <code>getInput()</code> to consume stdin.</small>
+          </div>
+          <div class="actions">
+            <button id="analyze-btn">AI Explain</button>
+            <button id="autofix-btn" class="secondary">Auto Fix</button>
+            <button id="run-btn" class="primary">Run Code</button>
+          </div>
+        </header>
+
+        <div class="tab-strip" role="tablist">
+          <div class="tabs">
+            <button class="tab active" role="tab" aria-selected="true">
+              <span class="filename">main.js</span>
+              <span class="badge">JS</span>
+            </button>
+          </div>
+          <div class="tab-meta">
+            <span class="status-led" aria-hidden="true"></span>
+            <span>Sandbox ready</span>
+          </div>
+        </div>
+
+        <main>
+          <section class="editor-panel">
+            <div class="editor-chrome">
+              <div class="crumbs">
+                workspace / src / <strong>main.js</strong>
+              </div>
+              <div class="inline-hint">Press Ctrl/Cmd + Enter to run (browser shortcut).</div>
+            </div>
+            <div id="editor"></div>
+            <div class="input-panel">
+              <label for="stdin">Program input</label>
+              <textarea id="stdin" placeholder="Provide newline separated input"></textarea>
+            </div>
+          </section>
+
+          <section class="insights-panel">
+            <div class="panel" id="execution-card">
+              <div class="panel-header">
+                <h2>Execution</h2>
+                <span class="tag">Terminal</span>
+              </div>
+              <div class="output-block">
+                <p><strong>Logs</strong></p>
+                <pre id="logs"></pre>
+              </div>
+              <div class="output-block">
+                <p><strong>Errors</strong></p>
+                <pre id="errors"></pre>
+              </div>
+              <div class="output-block">
+                <p><strong>Duration</strong></p>
+                <span id="duration">&mdash;</span>
+              </div>
+            </div>
+
+            <div class="panel" id="analysis-card">
+              <div class="panel-header">
+                <h2>AI Insights</h2>
+                <span class="tag">Assistant</span>
+              </div>
+              <div>
+                <h3>Explanation</h3>
+                <p id="explanation">Run an analysis to get a summary.</p>
+              </div>
+              <div>
+                <h3>Potential Issues</h3>
+                <ul id="issues"></ul>
+              </div>
+              <div>
+                <h3>Suggestions</h3>
+                <ul id="suggestions"></ul>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <div id="status-bar" role="status" aria-live="polite">Ready.</div>
+      </div>
+    </div>
+
+    <template id="default-code">
+const message = () => {
+  const name = readLine();
+  return `Hello, ${name}!`;
+};
+
+console.log(message());
+    </template>
+
+    <script>
+      window.__INITIAL_CODE__ = document.getElementById('default-code').innerHTML.trim();
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
