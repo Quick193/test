@@ -19,6 +19,7 @@ const newFileTemplate = document.getElementById('new-file-template');
 const activeTab = document.getElementById('active-file-tab');
 const menuStrip = document.querySelector('.menu-strip');
 const explorerPanel = document.querySelector('.explorer-panel');
+const saveBtn = null;
 
 let editor;
 let currentFilePath = 'main.js';
@@ -94,9 +95,6 @@ function handleMenuAction(event) {
     case 'view':
       explorerPanel.classList.toggle('collapsed');
       setStatus(explorerPanel.classList.contains('collapsed') ? 'Explorer hidden.' : 'Explorer shown.', '');
-      break;
-    case 'run':
-      runCode();
       break;
     case 'terminal':
       document.getElementById('execution-card').scrollIntoView({ behavior: 'smooth' });
@@ -223,6 +221,7 @@ function populateList(listEl, items = [], emptyText) {
 }
 
 function toggleBusy(button, isBusy) {
+  if (!button) return;
   button.disabled = isBusy;
   button.classList.toggle('loading', isBusy);
 }

@@ -27,26 +27,31 @@ bootstrapWorkspace();
 
 const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
-  if (req.method === 'POST' && parsedUrl.pathname === '/api/run') {
+  const pathname = normalizePath(parsedUrl.pathname);
+
+  if (req.method === 'POST' && pathname === '/api/run') {
     return handleRun(req, res);
   }
-  if (req.method === 'POST' && parsedUrl.pathname === '/api/analyze') {
+  if (req.method === 'POST' && pathname === '/api/analyze') {
     return handleAnalyze(req, res);
   }
-  if (req.method === 'POST' && parsedUrl.pathname === '/api/autofix') {
+  if (req.method === 'POST' && pathname === '/api/autofix') {
     return handleAutoFix(req, res);
   }
-  if (req.method === 'GET' && parsedUrl.pathname === '/api/files') {
+  if (req.method === 'GET' && pathname === '/api/files') {
     return handleListFiles(res);
   }
-  if (req.method === 'GET' && parsedUrl.pathname === '/api/file') {
+  if (req.method === 'GET' && pathname === '/api/file') {
     return handleReadFile(parsedUrl, res);
   }
-  if (req.method === 'POST' && parsedUrl.pathname === '/api/files') {
+  if (req.method === 'POST' && pathname === '/api/files') {
     return handleCreateFile(req, res);
   }
-  if (req.method === 'POST' && parsedUrl.pathname === '/api/save') {
+  if (req.method === 'POST' && pathname === '/api/save') {
     return handleSaveFile(req, res);
+  }
+  if (pathname.startsWith('/api/')) {
+    return json(res, 404, { error: 'Not found' });
   }
   serveStatic(parsedUrl, res);
 });
@@ -289,6 +294,13 @@ function json(res, status, payload) {
     'Access-Control-Allow-Origin': '*',
   });
   res.end(JSON.stringify(payload));
+}
+
+function normalizePath(pathname = '') {
+  if (pathname.length > 1 && pathname.endsWith('/')) {
+    return pathname.replace(/\/+$/, '');
+  }
+  return pathname || '/';
 }
 
 function toWorkspacePath(relativePath) {
