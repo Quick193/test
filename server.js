@@ -25,6 +25,8 @@ const workspaceDir = path.join(__dirname, 'workspace');
 
 bootstrapWorkspace();
 
+const PORT = process.env.PORT || 3000;
+
 const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = normalizePath(parsedUrl.pathname);
@@ -50,14 +52,14 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'POST' && pathname === '/api/save') {
     return handleSaveFile(req, res);
   }
-  if (pathname.startsWith('/api/')) {
+  if (pathname.startsWith('/api')) {
     return json(res, 404, { error: 'Not found' });
   }
-  serveStatic(parsedUrl, res);
+  serveStatic(req, parsedUrl, res);
 });
 
-server.listen(3000, () => {
-  console.log('Mini IDE server running on http://localhost:3000');
+server.listen(PORT, () => {
+  console.log(`Mini IDE server running on http://localhost:${PORT}`);
 });
 
 function collectBody(req) {
@@ -166,9 +168,10 @@ async function handleSaveFile(req, res) {
   }
 }
 
-function serveStatic(parsedUrl, res) {
+function serveStatic(req, parsedUrl, res) {
   let filePath = path.join(publicDir, parsedUrl.pathname === '/' ? 'index.html' : parsedUrl.pathname);
   if (!filePath.startsWith(publicDir)) {
+    if (wantsJson(req)) return json(res, 403, { error: 'Forbidden' });
     res.writeHead(403);
     res.end('Forbidden');
     return;
@@ -183,6 +186,7 @@ function serveStatic(parsedUrl, res) {
 
   fs.readFile(filePath, (err, data) => {
     if (err) {
+      if (wantsJson(req)) return json(res, 404, { error: 'Not found' });
       res.writeHead(404);
       res.end('Not found');
       return;
@@ -294,6 +298,11 @@ function json(res, status, payload) {
     'Access-Control-Allow-Origin': '*',
   });
   res.end(JSON.stringify(payload));
+}
+
+function wantsJson(req) {
+  const accept = req.headers['accept'] || '';
+  return accept.includes('application/json') || req.url.startsWith('/api');
 }
 
 function normalizePath(pathname = '') {

@@ -136,7 +136,7 @@ async function runCode() {
     };
     const response = await fetch('/api/run', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     });
     const data = await readJson(response);
@@ -157,7 +157,7 @@ async function analyzeCode() {
     const payload = { code: editor.getValue(), path: currentFilePath, language: currentLanguage };
     const response = await fetch('/api/analyze', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     });
     const data = await readJson(response);
@@ -177,7 +177,7 @@ async function autoFix() {
   try {
     const response = await fetch('/api/autofix', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ code: editor.getValue(), path: currentFilePath, language: currentLanguage }),
     });
     const data = await readJson(response);
@@ -237,8 +237,8 @@ async function readJson(response) {
   try {
     return JSON.parse(text);
   } catch (error) {
-    const snippet = text.slice(0, 120).replace(/\s+/g, ' ').trim();
-    throw new Error(snippet ? `Invalid JSON response: ${snippet}` : 'Invalid JSON response from server');
+    const snippet = text.slice(0, 160).replace(/\s+/g, ' ').trim();
+    return { error: snippet || 'Invalid JSON response from server' };
   }
 }
 
@@ -263,7 +263,7 @@ async function createFile() {
   try {
     const response = await fetch('/api/files', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify(payload),
     });
     const data = await readJson(response);
@@ -282,7 +282,7 @@ async function createFile() {
 async function loadFileTree() {
   fileTreeEl.innerHTML = '<li class="muted">Loading...</li>';
   try {
-    const response = await fetch('/api/files');
+    const response = await fetch('/api/files', { headers: { Accept: 'application/json' } });
     const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Failed to load files');
     renderTree(data.files || []);
@@ -322,7 +322,7 @@ function buildNode(node, depth) {
 async function openFile(path) {
   setStatus(`Opening ${path}...`, '');
   try {
-    const response = await fetch(`/api/file?path=${encodeURIComponent(path)}`);
+    const response = await fetch(`/api/file?path=${encodeURIComponent(path)}`, { headers: { Accept: 'application/json' } });
     const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Unable to read file');
     currentFilePath = data.path;
@@ -349,7 +349,7 @@ async function saveFile() {
   try {
     const response = await fetch('/api/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ path: currentFilePath, content: editor.getValue() }),
     });
     const data = await readJson(response);
