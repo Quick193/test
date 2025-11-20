@@ -31,6 +31,10 @@ const server = http.createServer(async (req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = normalizePath(parsedUrl.pathname);
 
+  if (req.method === 'OPTIONS' && pathname.startsWith('/api')) {
+    return sendOptions(res);
+  }
+
   if (req.method === 'POST' && pathname === '/api/run') {
     return handleRun(req, res);
   }
@@ -295,9 +299,22 @@ function autoFixCode(code, language = 'javascript') {
 function json(res, status, payload) {
   res.writeHead(status, {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
+    ...corsHeaders(),
   });
   res.end(JSON.stringify(payload));
+}
+
+function sendOptions(res) {
+  res.writeHead(204, { ...corsHeaders() });
+  res.end();
+}
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type,Accept',
+  };
 }
 
 function wantsJson(req) {
