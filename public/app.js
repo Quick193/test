@@ -87,7 +87,7 @@ async function runCode() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Execution failed');
     renderExecution(data);
     setStatus(`Executed ${currentLanguage.toUpperCase()} successfully.`, 'success');
@@ -108,7 +108,7 @@ async function analyzeCode() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Analysis failed');
     renderAnalysis(data);
     setStatus('Analysis ready.', 'success');
@@ -128,7 +128,7 @@ async function autoFix() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code: editor.getValue(), path: currentFilePath, language: currentLanguage }),
     });
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Auto fix failed');
     editor.setValue(data.code);
     renderAnalysis({ explanation: 'Code refreshed with automatic fixes.', issues: [], suggestions: data.summary || [] });
@@ -178,6 +178,17 @@ function setStatus(message, state) {
   statusBar.className = `status-bar${state ? ` ${state}` : ''}`;
 }
 
+async function readJson(response) {
+  const text = await response.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch (error) {
+    const snippet = text.slice(0, 120).replace(/\s+/g, ' ').trim();
+    throw new Error(snippet ? `Invalid JSON response: ${snippet}` : 'Invalid JSON response from server');
+  }
+}
+
 function toggleCreateFile(show) {
   createFileForm.hidden = !show;
   if (show) {
@@ -202,7 +213,7 @@ async function createFile() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Unable to create file');
     toggleCreateFile(false);
     await loadFileTree();
@@ -219,7 +230,7 @@ async function loadFileTree() {
   fileTreeEl.innerHTML = '<li class="muted">Loading...</li>';
   try {
     const response = await fetch('/api/files');
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Failed to load files');
     renderTree(data.files || []);
   } catch (error) {
@@ -259,7 +270,7 @@ async function openFile(path) {
   setStatus(`Opening ${path}...`, '');
   try {
     const response = await fetch(`/api/file?path=${encodeURIComponent(path)}`);
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Unable to read file');
     currentFilePath = data.path;
     currentLanguage = languageFromPath(currentFilePath);
@@ -288,7 +299,7 @@ async function saveFile() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ path: currentFilePath, content: editor.getValue() }),
     });
-    const data = await response.json();
+    const data = await readJson(response);
     if (!response.ok) throw new Error(data.error || 'Save failed');
     setStatus(`Saved ${currentFilePath}`, 'success');
   } catch (error) {
