@@ -1,8 +1,6 @@
 const runBtn = document.getElementById('run-btn');
 const analyzeBtn = document.getElementById('analyze-btn');
 const autoFixBtn = document.getElementById('autofix-btn');
-const saveBtn = document.getElementById('save-btn');
-const refreshFilesBtn = document.getElementById('refresh-files-btn');
 const logsEl = document.getElementById('logs');
 const errorsEl = document.getElementById('errors');
 const durationEl = document.getElementById('duration');
@@ -19,6 +17,8 @@ const createFileCancel = document.getElementById('create-file-cancel');
 const newFileName = document.getElementById('new-file-name');
 const newFileTemplate = document.getElementById('new-file-template');
 const activeTab = document.getElementById('active-file-tab');
+const menuStrip = document.querySelector('.menu-strip');
+const explorerPanel = document.querySelector('.explorer-panel');
 
 let editor;
 let currentFilePath = 'main.js';
@@ -66,11 +66,65 @@ function fallbackEditor() {
 runBtn.addEventListener('click', () => runCode());
 analyzeBtn.addEventListener('click', () => analyzeCode());
 autoFixBtn.addEventListener('click', () => autoFix());
-saveBtn.addEventListener('click', () => saveFile());
-refreshFilesBtn.addEventListener('click', () => loadFileTree());
 newFileBtn.addEventListener('click', () => toggleCreateFile(true));
 createFileCancel.addEventListener('click', () => toggleCreateFile(false));
 createFileConfirm.addEventListener('click', () => createFile());
+menuStrip.addEventListener('click', handleMenuAction);
+document.addEventListener('keydown', event => {
+  if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    saveFile();
+  }
+});
+
+function handleMenuAction(event) {
+  const menu = event.target.dataset.menu;
+  if (!menu) return;
+  switch (menu) {
+    case 'file':
+      showFileMenu();
+      break;
+    case 'edit':
+      focusEditor();
+      setStatus('Editor focused for quick edits.', '');
+      break;
+    case 'selection':
+      selectAllInEditor();
+      break;
+    case 'view':
+      explorerPanel.classList.toggle('collapsed');
+      setStatus(explorerPanel.classList.contains('collapsed') ? 'Explorer hidden.' : 'Explorer shown.', '');
+      break;
+    case 'run':
+      runCode();
+      break;
+    case 'terminal':
+      document.getElementById('execution-card').scrollIntoView({ behavior: 'smooth' });
+      setStatus('Scrolled to terminal output.', '');
+      break;
+    case 'help':
+      window.open('https://code.visualstudio.com/docs', '_blank');
+      setStatus('Opened VS Code docs in a new tab.', '');
+      break;
+    default:
+      break;
+  }
+}
+
+function showFileMenu() {
+  const choice = prompt('File actions: new, save, reload', 'new');
+  if (!choice) return;
+  const normalized = choice.toLowerCase();
+  if (normalized.startsWith('n')) {
+    toggleCreateFile(true);
+    setStatus('Ready to create a new file.', '');
+  } else if (normalized.startsWith('s')) {
+    saveFile();
+  } else if (normalized.startsWith('r')) {
+    loadFileTree();
+    setStatus('Refreshing file tree...', '');
+  }
+}
 
 async function runCode() {
   toggleBusy(runBtn, true);
@@ -322,6 +376,27 @@ function getTemplate(type) {
     default:
       return '"use strict";\n\nconst name = readLine();\nconsole.log(`Hello, ${name}!`);\n';
   }
+}
+
+function focusEditor() {
+  if (editor?.focus) {
+    editor.focus();
+  }
+}
+
+function selectAllInEditor() {
+  if (window.monaco && editor.getModel && editor.setSelection) {
+    const model = editor.getModel();
+    const fullRange = model.getFullModelRange();
+    editor.setSelection(fullRange);
+    editor.revealRangeInCenter(fullRange);
+    setStatus('Selected all content.', '');
+    return;
+  }
+  if (editor?.setSelectionRange) {
+    editor.setSelectionRange(0, editor.getValue().length);
+  }
+  setStatus('Selected all content.', '');
 }
 
 function languageFromPath(pathname = '') {

@@ -123,7 +123,14 @@ function handleReadFile(parsedUrl, res) {
 async function handleCreateFile(req, res) {
   try {
     const body = await collectBody(req);
-    const { path: filePath, content = '' } = JSON.parse(body || '{}');
+    if (!body) return json(res, 400, { error: 'Missing request body' });
+    let payload;
+    try {
+      payload = JSON.parse(body);
+    } catch (error) {
+      return json(res, 400, { error: 'Invalid JSON payload' });
+    }
+    const { path: filePath, content = '' } = payload || {};
     if (!filePath) return json(res, 400, { error: 'Missing file path' });
     const diskPath = toWorkspacePath(filePath);
     await fs.promises.mkdir(path.dirname(diskPath), { recursive: true });
@@ -137,7 +144,14 @@ async function handleCreateFile(req, res) {
 async function handleSaveFile(req, res) {
   try {
     const body = await collectBody(req);
-    const { path: filePath, content = '' } = JSON.parse(body || '{}');
+    if (!body) return json(res, 400, { error: 'Missing request body' });
+    let payload;
+    try {
+      payload = JSON.parse(body);
+    } catch (error) {
+      return json(res, 400, { error: 'Invalid JSON payload' });
+    }
+    const { path: filePath, content = '' } = payload || {};
     if (!filePath) return json(res, 400, { error: 'Missing file path' });
     const diskPath = toWorkspacePath(filePath);
     await fs.promises.writeFile(diskPath, content, 'utf8');

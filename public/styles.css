@@ -233,6 +233,8 @@ button:hover {
   padding: 0.75rem;
   border: 1px dashed var(--border);
   border-radius: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .create-file input,
@@ -249,6 +251,10 @@ button:hover {
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+}
+
+.explorer-panel.collapsed {
+  display: none;
 }
 
 .file-tree {
