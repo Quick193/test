@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini IDE</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="activity-bar" aria-label="Primary navigation">
+        <button class="activity-btn active" aria-label="Explorer">📁</button>
+        <button class="activity-btn" aria-label="Search">🔎</button>
+        <button class="activity-btn" aria-label="Source Control">⌥</button>
+        <button class="activity-btn" aria-label="Run and Debug">▶️</button>
+        <button class="activity-btn" aria-label="Extensions">🧩</button>
+      </aside>
+
+      <div class="main-column">
+        <header class="command-bar">
+          <div class="brand">
+            <span class="brand-dot"></span>
+            <div>
+              <strong>Mini IDE</strong>
+              <small>Cursor-inspired workspace</small>
+            </div>
+          </div>
+          <nav class="menu-strip" aria-label="Application menu">
+            <button type="button">File</button>
+            <button type="button">Edit</button>
+            <button type="button">Selection</button>
+            <button type="button">View</button>
+            <button type="button">Go</button>
+            <button type="button">Run</button>
+            <button type="button">Terminal</button>
+            <button type="button">Help</button>
+          </nav>
+          <div class="command-actions">
+            <div class="utility-buttons">
+              <button type="button" id="refresh-files-btn" class="ghost">Reload Files</button>
+              <button type="button" id="save-btn">Save</button>
+            </div>
+            <label class="command-search">
+              <span aria-hidden="true">⌘</span>
+              <input
+                type="search"
+                placeholder="Search files or run command (Ctrl/Cmd + P)"
+                aria-label="Quick search"
+              />
+            </label>
+            <div class="action-buttons">
+              <button id="analyze-btn">Analyze</button>
+              <button id="autofix-btn" class="ghost">Auto Fix</button>
+              <button id="run-btn" class="primary">Run ▶</button>
+            </div>
+          </div>
+        </header>
+
+        <main class="workspace">
+          <section class="explorer-panel" aria-label="Project explorer">
+            <div class="explorer-header">
+              <span>EXPLORER</span>
+              <button id="new-file-btn" class="ghost" title="Create file">＋</button>
+            </div>
+            <div class="create-file" id="create-file-form" hidden>
+              <input type="text" id="new-file-name" placeholder="e.g. utils/helper.js" aria-label="File name" />
+              <select id="new-file-template" aria-label="Starter template">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="markdown">Markdown</option>
+                <option value="text">Plain text</option>
+              </select>
+              <div class="create-file-actions">
+                <button id="create-file-confirm" class="primary" type="button">Create</button>
+                <button id="create-file-cancel" class="ghost" type="button">Cancel</button>
+              </div>
+            </div>
+            <ul class="file-tree" id="file-tree"></ul>
+            <p class="helper">Use <code>readLine()</code> to read sandbox input.</p>
+          </section>
+
+          <section class="editor-stack">
+            <div class="tab-bar" role="tablist">
+              <button class="tab active" role="tab" aria-selected="true" id="active-file-tab">Untitled</button>
+            </div>
+            <div class="editor-panel">
+              <div id="editor"></div>
+              <div class="input-panel">
+                <label for="stdin">Program input</label>
+                <textarea id="stdin" placeholder="Provide newline separated input"></textarea>
+              </div>
+            </div>
+          </section>
+
+          <section class="insights-panel">
+            <div class="panel-card" id="execution-card">
+              <div class="panel-header">
+                <h2>Terminal</h2>
+                <span>Run output</span>
+              </div>
+              <div class="output-block">
+                <p><strong>Logs</strong></p>
+                <pre id="logs"></pre>
+              </div>
+              <div class="output-block">
+                <p><strong>Errors</strong></p>
+                <pre id="errors"></pre>
+              </div>
+              <div class="output-block duration">
+                <p><strong>Duration</strong></p>
+                <span id="duration">&mdash;</span>
+              </div>
+            </div>
+
+            <div class="panel-card" id="analysis-card">
+              <div class="panel-header">
+                <h2>AI Insights</h2>
+                <span>Explainers & fixes</span>
+              </div>
+              <div>
+                <h3>Explanation</h3>
+                <p id="explanation">Run an analysis to get a summary.</p>
+              </div>
+              <div>
+                <h3>Potential Issues</h3>
+                <ul id="issues"></ul>
+              </div>
+              <div>
+                <h3>Suggestions</h3>
+                <ul id="suggestions"></ul>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer id="status-bar" class="status-bar" role="status" aria-live="polite">Ready.</footer>
+      </div>
+    </div>
+
+    <script>
+      window.__INITIAL_CODE__ = '';
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
