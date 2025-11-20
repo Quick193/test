@@ -32,9 +32,8 @@
             </div>
           </div>
           <nav class="menu-strip" aria-label="Application menu">
-            <button type="button">File</button>
-            <button type="button">Edit</button>
-            <button type="button">Selection</button>
+            <button type="button" id="save-btn">Save</button>
+            <button type="button" id="refresh-files-btn">Reload Files</button>
             <button type="button">Run</button>
             <button type="button">AI</button>
             <button type="button">Help</button>
@@ -58,22 +57,31 @@
 
         <main class="workspace">
           <section class="explorer-panel" aria-label="Project explorer">
-            <div class="explorer-header">EXPLORER</div>
-            <ul class="file-tree">
-              <li class="open">📁 sandbox</li>
-              <li>└── server.js</li>
-              <li>└── public</li>
-              <li class="active-file">&nbsp;&nbsp;&nbsp;├── index.html</li>
-              <li>&nbsp;&nbsp;&nbsp;├── app.js</li>
-              <li>&nbsp;&nbsp;&nbsp;└── styles.css</li>
-            </ul>
+            <div class="explorer-header">
+              <span>EXPLORER</span>
+              <button id="new-file-btn" class="ghost" title="Create file">＋</button>
+            </div>
+            <div class="create-file" id="create-file-form" hidden>
+              <input type="text" id="new-file-name" placeholder="e.g. utils/helper.js" aria-label="File name" />
+              <select id="new-file-template" aria-label="Starter template">
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="java">Java</option>
+                <option value="markdown">Markdown</option>
+                <option value="text">Plain text</option>
+              </select>
+              <div class="create-file-actions">
+                <button id="create-file-confirm" class="primary" type="button">Create</button>
+                <button id="create-file-cancel" class="ghost" type="button">Cancel</button>
+              </div>
+            </div>
+            <ul class="file-tree" id="file-tree"></ul>
             <p class="helper">Use <code>readLine()</code> to read sandbox input.</p>
           </section>
 
           <section class="editor-stack">
             <div class="tab-bar" role="tablist">
-              <button class="tab active" role="tab" aria-selected="true">app.js</button>
-              <button class="tab" role="tab" aria-selected="false">README.md</button>
+              <button class="tab active" role="tab" aria-selected="true" id="active-file-tab">Untitled</button>
             </div>
             <div class="editor-panel">
               <div id="editor"></div>
@@ -129,17 +137,8 @@
       </div>
     </div>
 
-    <template id="default-code">
-const message = () => {
-  const name = readLine();
-  return `Hello, ${name}!`;
-};
-
-console.log(message());
-    </template>
-
     <script>
-      window.__INITIAL_CODE__ = document.getElementById('default-code').innerHTML.trim();
+      window.__INITIAL_CODE__ = '';
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
     <script type="module" src="/app.js"></script>
